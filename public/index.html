@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Loading in bootstrap, jquery, and javascript -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+      crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" 
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" 
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"> </script>
+
+    <!-- css -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/index.css">
+
+    <!-- necessary manifest.json -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- font awesome -->
+    <script src="https://kit.fontawesome.com/59df0f1cf2.js" crossorigin="anonymous"></script>
+
+    <title>Pathfinding Algorithms</title>
+  </head> <!-- end head -->
+
+  <body>
+    <div class="row">
+      <div class="col-5">
+        <h3 class="p-2 mt-2 ml-2"> Pathfinding Algorithm Visualization </h3>
+      </div>
+
+      <div class="col-6"></div>
+
+      <div class="col-1 mt-3">
+        <a href="#"> code </a>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="column-2 mr-4">
+        <h4 class="p-1 pl-4 ml-1"> Algorithms </h4>
+        <h4 class="p-1 pl-4 ml-1"> Maze Generation </h4>
+        <h4 class="p-1 pl-4 ml-1"> Add a Node </h4>
+        <h4 class="p-1 pl-4 ml-1"> Speed </h4>
+        <button class="btn btn-success right"> Visualize! </button>
+        <button class="btn btn-danger left" onclick="clearBoard()"> Clear Board </button>
+
+        <h4 class="p-1 pl-4 ml-1 clear"> Legend </h4>
+
+
+      </div>
+
+      <div class="column-10">
+        <h2 id="title" class="text-center p-1"> click & drag to place walls, pick an algorithm, and visualize it! </h2>
+        <div id="table" class="ml-4"></div>
+      </div>
+
+    </div>
+
+
+    
+    <div id="root">
+
+    </div>
+  </body> <!-- end body -->
+
+  <script type="text/javascript">
+    function clearBoard() {
+      var elements = document.getElementsByTagName("td")
+      for (var x = 0; x < elements.length; ++x) {
+        if (elements[x].classList.contains("wall")) {
+          elements[x].classList.remove("wall");
+          elements[x].classList.remove("none");
+        }
+      }
+    }
+  </script>
+
+</html>
