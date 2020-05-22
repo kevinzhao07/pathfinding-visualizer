@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 
 class TableData extends React.Component {
 
@@ -220,9 +219,20 @@ class Body extends React.Component {
   }
 }
 
+// clears the baord
+function clearBoard() {
+  var elements = document.getElementsByTagName("td");
+  for (var x = 0; x < elements.length; ++x) {
+    if (elements[x].classList.contains("wall")) {
+      elements[x].classList.remove("wall");
+      elements[x].classList.remove("none");
+    }
+  }
+}
+
 function Start(props) {
   return(
-    <i id="start-icon" className="fas fa-chevron-circle-right start"></i>
+    <i id="start-icon" className="far fa-arrow-alt-circle-right start"></i>
   );
 }
 
@@ -230,6 +240,33 @@ function End(props) {
   return(
     <i id="end-icon" className="fas fa-gift start"></i>
   );
+}
+
+function Random(props) {
+  return(
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Random Maze </button>
+  );
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function randomMaze() {
+  clearBoard();
+  for (var i = 0; i < 30; ++i) {
+    for (var j = 0; j < 55; ++j) {
+      var idValue = "" + String(i) + "-" + String(j);
+      var random = document.getElementById(idValue);
+      if (Math.floor(Math.random() * 6) == 1) {
+        if (!(idValue === lastStart || idValue === lastEnd)) {
+          random.classList.add("wall");
+          random.classList.add("none");
+          await sleep(15);
+        }
+      }
+    }
+  }
 }
 
 // modifying where the startNode is
@@ -270,4 +307,11 @@ ReactDOM.render(
 ReactDOM.render(
   <End />,
   document.getElementById('14-43')
+);
+
+ReactDOM.render(
+  <Random 
+    onClick={() => randomMaze()}
+  />,
+  document.getElementById('maze-generation')
 );
