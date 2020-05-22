@@ -88,6 +88,7 @@ i.start {
   font-size: 1.5em;
   margin-left: 8%;
   animation: moveStart 0.4s;
+  color: #a7f9ff;
 }
 
 @keyframes moveStart {
@@ -105,3 +106,40 @@ i.start {
 i.dark {
   color: #525252 !important;
 }
+
+.maze-color {
+  color: #82c1eb;
+}
+
+.algorithm-color {
+  color: #dd7777;
+}
+
+button.random-maze {
+  float: right;
+  border-radius: 10px;
+  outline: none;
+  background-color: #6299be;
+  border-top: 2px solid #bcdff7;
+  border-left: 2px solid #bcdff7;
+  border-right: 2px solid #66869c;
+  border-bottom: 2px solid #66869c;
+  color: #dfdfdf;
+  font-weight: 600;
+}
+
+button.random-maze:hover {
+  color: #dfdfdf;
+  background-color: #5a88a7;
+  animation: changeBackground 0.4s;
+}
+
+@keyframes changeBackground {
+  0% {
+    background-color: #6299be;
+  }
+  100% {
+    background-color: #5a88a7;
+  }
+}
+

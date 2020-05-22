@@ -44,8 +44,10 @@
 
     <div class="row">
       <div class="column-2 mr-4">
-        <h4 class="p-1 pl-4 ml-1"> Algorithms </h4>
-        <h4 class="p-1 pl-4 ml-1"> Maze Generation </h4>
+        <h4 class="p-1 pl-4 ml-1 algorithm-color"> Algorithms </h4>
+        <h4 class="p-1 pl-4 ml-1 maze-color"> Maze Generation </h4>
+        <div id="maze-generation">
+        </div>
         <h4 class="p-1 pl-4 ml-1"> Add a Node </h4>
         <h4 class="p-1 pl-4 ml-1"> Speed </h4>
         <button class="btn btn-success right"> Visualize! </button>
@@ -63,16 +65,16 @@
 
     </div>
 
-
-    
     <div id="root">
 
     </div>
+
   </body> <!-- end body -->
 
   <script type="text/javascript">
+
     function clearBoard() {
-      var elements = document.getElementsByTagName("td")
+      var elements = document.getElementsByTagName("td");
       for (var x = 0; x < elements.length; ++x) {
         if (elements[x].classList.contains("wall")) {
           elements[x].classList.remove("wall");
@@ -80,6 +82,7 @@
         }
       }
     }
+
   </script>
 
 </html>
