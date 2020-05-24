@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+// TableData handles clicks, drawing and erasing walls, etc. 
 class TableData extends React.Component {
 
   handleClick(val) {
@@ -46,7 +47,7 @@ class TableData extends React.Component {
           unit.classList.remove("none");
         }
         unit.classList.add("other");
-        unit.innerHTML = '<i id="start-icon" class="fas fa-chevron-circle-right start"></i>';
+        unit.innerHTML = '<i id="start-icon" class="far fa-arrow-alt-circle-right start"></i>';
 
         return; // don't execute rest
       }
@@ -71,7 +72,7 @@ class TableData extends React.Component {
         lastEnd = val; // this will be the new place of the startNode
 
         // adding the new startNode
-        var unit = document.getElementById(val);
+        unit = document.getElementById(val);
         unit.classList.remove("unit");
         hadWallEnd = false;
         if (unit.classList.contains("wall")) {
@@ -167,6 +168,7 @@ class TableData extends React.Component {
   }
 } // end TableData Component
 
+// simple rendering of the entire grid
 class Body extends React.Component {
   constructor(props) {
     super(props); // always needed
@@ -219,10 +221,11 @@ class Body extends React.Component {
   }
 }
 
-// clears the baord
+// clears the board
 function clearBoard() {
   var elements = document.getElementsByTagName("td");
   for (var x = 0; x < elements.length; ++x) {
+    elements[x].classList.remove("visited");
     if (elements[x].classList.contains("wall")) {
       elements[x].classList.remove("wall");
       elements[x].classList.remove("none");
@@ -230,28 +233,163 @@ function clearBoard() {
   }
 }
 
-function Start(props) {
-  return(
-    <i id="start-icon" className="far fa-arrow-alt-circle-right start"></i>
-  );
+// find coordinate on graph, can use to find <td>
+function findCoords(position) {
+  var row = "";
+  var col = "";
+
+  if (startNode.length === 3) { // X-X
+    row = startNode.substring(0, 1);
+    col = startNode.substring(2);
+  }
+
+  else if (startNode.length === 5) { // XX-XX
+    row = startNode.substring(0, 2);
+    col = startNode.substring(3);
+  }
+
+  // two scenarios: XX-X or X-XX
+  else if (startNode.length === 4) {
+
+    if (startNode.substring(1, 2) === "-") { // X-XX
+      row = startNode.substring(0, 1);
+      col = startNode.substring(2);
+    }
+    else if (startNode.substring(2, 3) === "-" ) { // XX_X
+      row = startNode.substring(0, 2);
+      col = startNode.substring(3);
+    }
+  }
+
+  // convert to integers
+  row = parseInt(row, 10);
+  col = parseInt(col, 10);
+
+  return [row, col];
 }
 
-function End(props) {
-  return(
-    <i id="end-icon" className="fas fa-gift start"></i>
-  );
+// calculating NESW
+function calcNorth(coord) {
+  if (coord[0] - 1 >= 0) {
+    var north = "" + String(coord[0] - 1) + "-" + String(coord[1]);
+    var northCell = document.getElementById(north);
+    return northCell;
+  }
+  return false;
 }
 
-function Random(props) {
-  return(
-    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Random Maze </button>
-  );
+function calcEast(coord) {
+  if (coord[1] + 1 < 55) {
+    var east = "" + String(coord[0]) + "-" + String(coord[1] + 1);
+    var eastCell = document.getElementById(east);
+    return eastCell;
+  }
+  return false;
 }
 
+function calcSouth(coord) {
+  if (coord[0] + 1 < 30) {
+    var south = "" + String(coord[0] + 1) + "-" + String(coord[1]);
+    var southCell = document.getElementById(south);
+    return southCell;
+  }
+  return false;
+}
+
+function calcWest(coord) {
+  if (coord[1] - 1 >= 0) {
+    var west = "" + String(coord[0]) + "-" + String(coord[1] - 1);
+    var westCell = document.getElementById(west);
+    return westCell;
+  }
+  return false;
+}
+
+// visualize depth first search
+async function depthFirst() {
+
+  // remove previous visited
+  var elements = document.getElementsByTagName("td");
+  for (var x = 0; x < elements.length; ++x) {
+    elements[x].classList.remove("visited");
+  }
+
+  // stack
+  var array = [];
+
+  // calculating row and column
+  array.push(findCoords(startNode));
+
+  while (array.length != 0) {
+    var next = array.pop();
+    var north = calcNorth(next);
+    var east = calcEast(next);
+    var south = calcSouth(next);
+    var west = calcWest(next);
+      
+    var nextId = "" + String(next[0]) + "-" + String(next[1]);
+    var nextElement = document.getElementById(nextId);
+    
+    if (nextElement.innerHTML == '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+      nextElement.classList.add("visited");
+      return;
+    }
+    else {
+      nextElement.classList.add("visited");
+    }
+    
+    await sleep(10);
+
+    // calculating north, east, south, west
+    if (north != false) {
+      if (!north.classList.contains("wall") && !north.classList.contains("visited")) {
+        array.push([next[0] - 1, next[1]]);
+      }
+    }
+
+    if (east != false) {
+      if (!east.classList.contains("wall") && !east.classList.contains("visited")) {
+        array.push([next[0], next[1] + 1]);
+      }
+    }
+
+    if (south != false) {
+      if (!south.classList.contains("wall") && !south.classList.contains("visited")) {
+        array.push([next[0] + 1, next[1]]);
+      }
+      
+    }
+
+    if (west != false) {
+      if (!west.classList.contains("wall") && !west.classList.contains("visited")) {
+        array.push([next[0], next[1] - 1]);
+      }
+    }
+
+  }
+}
+
+// set visualization to depth first search
+function setDepthFirst() {
+  algorithm = "depth-first";
+}
+
+// calls correct algorithm to visualize
+function visualize() {
+  if (algorithm === "depth-first") {
+    depthFirst();
+  }
+  else {
+    alert("Choose an algorithm on the left!");
+  }
+}
+
+// sleep function allowing users to see search 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// creating random maze
 async function randomMaze() {
   clearBoard();
   for (var i = 0; i < 30; ++i) {
@@ -285,6 +423,11 @@ let hadWallEnd = false;
 let clicked = 0;
 let listChanged = [];
 let element = document.getElementsByTagName("body")[0];
+
+// setting which algorithm
+let algorithm = "";
+
+// entire body mouseup/down, keeping track when creating walls
 element.addEventListener("mousedown", function() {
   clicked = 1;
 });
@@ -292,6 +435,36 @@ element.addEventListener("mouseup", function() {
   clicked = 0;
   listChanged = [];
 });
+
+function Start(props) {
+  return(
+    <i id="start-icon" className="far fa-arrow-alt-circle-right start"></i>
+  );
+}
+
+function End(props) {
+  return(
+    <i id="end-icon" className="fas fa-gift start"></i>
+  );
+}
+
+function Random(props) {
+  return(
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Random Maze </button>
+  );
+}
+
+function Visualize(props) {
+  return(
+    <button onClick={props.onClick} className="btn btn-success"> Visualize! </button>
+  );
+}
+
+function DepthFirst(props) {
+  return(
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Depth First Search </button>
+  );
+}
 
 ReactDOM.render(
   <Body />,
@@ -315,3 +488,17 @@ ReactDOM.render(
   />,
   document.getElementById('maze-generation')
 );
+
+ReactDOM.render(
+  <Visualize
+    onClick={() => visualize()}
+  />,
+  document.getElementById('visualize')
+)
+
+ReactDOM.render(
+  <DepthFirst
+    onClick={() => setDepthFirst()}
+  />,
+  document.getElementById('depth-first')
+)

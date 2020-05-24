@@ -21,11 +21,11 @@ div.column-10 {
   width: 82%;
 }
 
-button.right {
+.right {
   float: right;
 }
 
-button.left {
+.left {
   float: left;
   margin-left: 1.5vw;
 }
@@ -69,6 +69,25 @@ td.wall {
   }
   100% {
     background-color: #f2ffff;
+    transform: scale(1.0);
+  }
+}
+
+td.visited {
+  background-color: #51b3cc;
+  animation: colorVisited 0.25s;
+}
+
+@keyframes colorVisited {
+  0% {
+    background-color: transparent;
+    transform: scale(0.1);
+  }
+  85% {
+    transform: scale(1.10);
+  }
+  100% {
+    background-color: #51b3cc;
     transform: scale(1.0);
   }
 }
