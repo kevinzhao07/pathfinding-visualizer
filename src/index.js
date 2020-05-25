@@ -9,7 +9,8 @@ class TableData extends React.Component {
     if (clicked === 1) {
 
       // allow for visualization while moving end node
-      if (endClick === endNode || startClick === startNode && visualized) {
+      if ((endClick === endNode || startClick === startNode) && visualized) {
+        firstTime = false;
         visualize();
       }
 
@@ -156,6 +157,11 @@ class TableData extends React.Component {
   setNodes(val) {
     startNode = lastStart;
     endNode = lastEnd;
+
+    if (visualized) {
+      visualize();
+    }
+
   }
 
   render() {
@@ -232,9 +238,12 @@ function clearBoard() {
   var elements = document.getElementsByTagName("td");
   for (var x = 0; x < elements.length; ++x) {
     elements[x].classList.remove("visited");
+    elements[x].classList.remove("path");
+    elements[x].classList.remove("none");
+    elements[x].classList.remove("animation");
+    elements[x].classList.remove("no-animation");
     if (elements[x].classList.contains("wall")) {
       elements[x].classList.remove("wall");
-      elements[x].classList.remove("none");
     }
   }
   algorithm = "";
@@ -312,27 +321,43 @@ function calcWest(coord) {
   return false;
 }
 
-// visualize depth or breadth first search
 async function DepthBreadth(alg) {
 
-  // remove previous visited
+  // remove previous markings and creates 2d array for backtrack
+  backtrack = [];
+  var row = [];
   var elements = document.getElementsByTagName("td");
   for (var x = 0; x < elements.length; ++x) {
+    if (row.length !== 54) {
+      row.push('');
+    }
+    else {
+      row = [];
+      backtrack.push(row);
+    }
     elements[x].classList.remove("visited");
+    elements[x].classList.remove("path");
+    elements[x].classList.remove("animation");
+    elements[x].classList.remove("no-animation");
+    if (!elements[x].classList.contains("wall")) {
+      elements[x].classList.remove("none");
+    }
   }
-
+  console.log(backtrack);
+  
   // stack/queue
   var array = [];
-
+  
   // calculating row and column
-
-  array.push(findCoords(lastStart));
-
+  var startCoordinates = findCoords(lastStart);
+  backtrack[startCoordinates[0]][startCoordinates[1]] = "*";
+  array.push(startCoordinates);
+  
   // while array not empty on depth-first
   var breadthCounter = 0;
-  while (array.length !== 0) {
+  while (array.length != 0) {
     var next;
-
+    
     if (alg === "depth") {
       next = array.pop();
     }
@@ -353,56 +378,148 @@ async function DepthBreadth(alg) {
     var east = calcEast(next);
     var south = calcSouth(next);
     var west = calcWest(next);
-    
-    // nice animation!
-    // await sleep(5);
+
+    // nice animation
+    if (firstTime) {
+      await sleep(10);
+    }
 
     // calculating north, east, south, west to see if they should be added
     // also, if we ever find the end, we can stop.
     if (north !== false) {
       if (north.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+        backtrack[next[0] - 1][next[1]] = "n";
         north.classList.add("visited");
+        if (firstTime) {
+          north.classList.add("animation");
+        }
+        else {
+          north.classList.add("no-animation");
+        }
+        printPath();
         return;
       }
-      if (!north.classList.contains("wall") && !north.classList.contains("visited")) {
+      if (!north.classList.contains("wall") && !north.classList.contains("visited") && north.innerHTML === "") {
         array.push([next[0] - 1, next[1]]);
         north.classList.add("visited");
+        if (firstTime) {
+          north.classList.add("animation");
+        }
+        else {
+          north.classList.add("no-animation");
+        }
+        backtrack[next[0] - 1][next[1]] = "n";
       }
     }
 
     if (east !== false) {
       if (east.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
         east.classList.add("visited");
+        backtrack[next[0]][next[1] + 1] = "e";
+        if (firstTime) {
+          east.classList.add("animation");
+        }
+        else {
+          east.classList.add("no-animation");
+        }
+        printPath();
         return;
       }
-      if (!east.classList.contains("wall") && !east.classList.contains("visited")) {
+      if (!east.classList.contains("wall") && !east.classList.contains("visited") && east.innerHTML === "") {
         array.push([next[0], next[1] + 1]);
         east.classList.add("visited");
+        if (firstTime) {
+          east.classList.add("animation");
+        }
+        else {
+          east.classList.add("no-animation");
+        }
+        backtrack[next[0]][next[1] + 1] = "e";
       }
     }
 
     if (south !== false) {
       if (south.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
         south.classList.add("visited");
+        backtrack[next[0] + 1][next[1]] = "s";
+        if (firstTime) {
+          south.classList.add("animation");
+        }
+        else {
+          south.classList.add("no-animation");
+        }
+        printPath();
         return;
       }
-      if (!south.classList.contains("wall") && !south.classList.contains("visited")) {
+      if (!south.classList.contains("wall") && !south.classList.contains("visited") && south.innerHTML === "") {
         array.push([next[0] + 1, next[1]]);
         south.classList.add("visited");
+        if (firstTime) {
+          south.classList.add("animation");
+        }
+        else {
+          south.classList.add("no-animation");
+        }
+        backtrack[next[0] + 1][next[1]] = "s";
       }
     }
 
     if (west !== false) {
       if (west.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
         west.classList.add("visited");
+        backtrack[next[0]][next[1] - 1] = "w";
+        if (firstTime) {
+          west.classList.add("animation");
+        }
+        else {
+          west.classList.add("no-animation");
+        }
+        printPath();
         return;
       }
-      if (!west.classList.contains("wall") && !west.classList.contains("visited")) {
+      if (!west.classList.contains("wall") && !west.classList.contains("visited") && west.innerHTML === "") {
         array.push([next[0], next[1] - 1]);
         west.classList.add("visited");
+        if (firstTime) {
+          west.classList.add("animation");
+        }
+        else {
+          west.classList.add("no-animation");
+        }
+        backtrack[next[0]][next[1] - 1] = "w";
       }
     }
+
   }
+}
+
+function printPath() {
+  var endCoords = findCoords(lastEnd);
+  
+  // go back until we find the start node
+  while (backtrack[endCoords[0]][endCoords[1]] !== "*") {
+    document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('path');
+    document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('none');
+    
+    // we came here from NORTH, to backtrack, so SOUTH
+    if (backtrack[endCoords[0]][endCoords[1]] === "n") {
+      endCoords = [endCoords[0] + 1, endCoords[1]];
+    }
+
+    else if (backtrack[endCoords[0]][endCoords[1]] === "e") {
+      endCoords = [endCoords[0], endCoords[1] - 1];
+    }
+
+    else if (backtrack[endCoords[0]][endCoords[1]] === "s") {
+      endCoords = [endCoords[0] - 1, endCoords[1]];
+    }
+
+    else if (backtrack[endCoords[0]][endCoords[1]] === "w") {
+      endCoords = [endCoords[0], endCoords[1] + 1];
+    }
+  }
+  document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('path');
+  document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('none');
 }
 
 // clear all other buttons
@@ -433,11 +550,18 @@ function visualize() {
   visualized = true;
   if (algorithm === "depth-first") {
     DepthBreadth("depth");
+    if (document.getElementById(lastEnd).classList.contains("visited")) {
+      printPath();
+    }
   }
   else if (algorithm === "breadth-first") {
     DepthBreadth("breadth");
+    if (document.getElementById(lastEnd).classList.contains("visited")) {
+      printPath();
+    }
   }
   else {
+    visualized = false;
     alert("Choose an algorithm on the left!");
   }
 }
@@ -465,6 +589,10 @@ async function randomMaze() {
   }
 }
 
+function clearFirstTime() {
+  firstTime = true;
+}
+
 // modifying where the startNode is
 let startNode = "14-11";
 let startClick = "";
@@ -482,9 +610,11 @@ let clicked = 0;
 let listChanged = [];
 let element = document.getElementsByTagName("body")[0];
 
-// setting which algorithm
+// setting which algorithm, and put backtracking
 let algorithm = "";
 let visualized = false;
+let backtrack = [];
+let firstTime = true;
 
 // entire body mouseup/down, keeping track when creating walls
 element.addEventListener("mousedown", function() {
@@ -515,7 +645,7 @@ function Random(props) {
 
 function Visualize(props) {
   return(
-    <button onClick={props.onClick} className="btn btn-success"> Visualize! </button>
+    <button onClick={props.onClick} onMouseDown={props.onMouseDown} className="btn btn-success"> Visualize! </button>
   );
 }
 
@@ -563,6 +693,7 @@ ReactDOM.render(
 ReactDOM.render(
   <Visualize
     onClick={() => visualize()}
+    onMouseDown={() => clearFirstTime()}
   />,
   document.getElementById('visualize')
 )

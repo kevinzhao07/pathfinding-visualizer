@@ -73,12 +73,35 @@ td.wall {
   }
 }
 
-td.visited {
+td.animation {
   background-color: #51b3cc;
-  /* animation: colorVisited 0.25s; */
+  animation: colorVisited 0.25s;
+}
+
+td.no-animation {
+  background-color: #51b3cc;
 }
 
 @keyframes colorVisited {
+  0% {
+    background-color: #8ad5e7;
+    transform: scale(0.1);
+  }
+  85% {
+    transform: scale(1.10);
+  }
+  100% {
+    background-color: #51b3cc;
+    transform: scale(1.0);
+  }
+}
+
+td.path {
+  background-color: #e9e642 !important;
+  /* animation: pathColor 0.25s; */
+}
+
+@keyframes pathColor {
   0% {
     background-color: transparent;
     transform: scale(0.1);
@@ -87,7 +110,7 @@ td.visited {
     transform: scale(1.10);
   }
   100% {
-    background-color: #51b3cc;
+    background-color: #e9e642;
     transform: scale(1.0);
   }
 }
@@ -107,7 +130,7 @@ i.start {
   font-size: 1.5em;
   margin-left: 8%;
   animation: moveStart 0.4s;
-  color: #a7f9ff;
+  color: #dffdff;
 }
 
 @keyframes moveStart {
