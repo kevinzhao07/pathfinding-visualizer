@@ -3,7 +3,7 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-color: #6b6b6b;
+  background-color: #3d3d3d;
   color: #e3e3e3;
   user-select: none;
 }
@@ -75,7 +75,7 @@ td.wall {
 
 td.visited {
   background-color: #51b3cc;
-  animation: colorVisited 0.25s;
+  /* animation: colorVisited 0.25s; */
 }
 
 @keyframes colorVisited {
@@ -143,22 +143,57 @@ button.random-maze {
   border-left: 2px solid #bcdff7;
   border-right: 2px solid #66869c;
   border-bottom: 2px solid #66869c;
-  color: #dfdfdf;
   font-weight: 600;
 }
 
 button.random-maze:hover {
-  color: #dfdfdf;
-  background-color: #5a88a7;
-  animation: changeBackground 0.4s;
+  background-color: #4d7491;
+  animation: random-maze 0.4s;
 }
 
-@keyframes changeBackground {
+@keyframes random-maze {
   0% {
     background-color: #6299be;
   }
   100% {
-    background-color: #5a88a7;
+    background-color: #4d7491;
   }
 }
 
+button.search {
+  float: right;
+  border-radius: 10px;
+  outline: none;
+  background-color: #be6262;
+  border-top: 2px solid #f7bcbc;
+  border-left: 2px solid #f7bcbc;
+  border-right: 2px solid #855555;
+  border-bottom: 2px solid #855555;
+  font-weight: 600;
+}
+
+button.selected {
+  background-color: #914d4d !important;
+}
+
+button.search:hover {
+  background-color: #914d4d;
+  animation: search 0.4s;
+}
+
+button.search:active {
+  background-color: #914d4d;
+}
+
+@keyframes search {
+  0% {
+    background-color: #be6262;
+  }
+  100% {
+    background-color: #914d4d;
+  }
+}
+
+.underline {
+  text-decoration: underline;
+}

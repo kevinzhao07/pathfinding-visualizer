@@ -6,15 +6,20 @@ class TableData extends React.Component {
 
   handleClick(val) {
 
-    if (clicked == 1) {
+    if (clicked === 1) {
+
+      // allow for visualization while moving end node
+      if (endClick === endNode || startClick === startNode && visualized) {
+        visualize();
+      }
 
       // we only want animation for startNode to happen one time
-      if (startClick === startNode && val == lastStart) {
+      if (startClick === startNode && val === lastStart) {
         return; // don't execute rest
       }
 
       // we only want animation for endNode to happen one time
-      if (endClick === endNode && val == lastEnd) {
+      if (endClick === endNode && val === lastEnd) {
         return; // don't execute rest
       }
 
@@ -36,7 +41,7 @@ class TableData extends React.Component {
           last.classList.add("none");
         }
         lastStart = val; // this will be the new place of the startNode
-
+        
         // adding the new startNode
         var unit = document.getElementById(val);
         unit.classList.remove("unit");
@@ -60,7 +65,7 @@ class TableData extends React.Component {
           return;
         }
 
-        // clearing where the startNode was last
+        // clearing where the endNode was last
         last = document.getElementById(lastEnd);
         last.innerHTML = "";
         last.classList.add("unit");
@@ -69,9 +74,9 @@ class TableData extends React.Component {
           last.classList.add("wall");
           last.classList.add("none");
         }
-        lastEnd = val; // this will be the new place of the startNode
+        lastEnd = val; // this will be the new place of the endNode
 
-        // adding the new startNode
+        // adding the new endNode
         unit = document.getElementById(val);
         unit.classList.remove("unit");
         hadWallEnd = false;
@@ -86,13 +91,8 @@ class TableData extends React.Component {
         return; // don't execute rest
       }
 
-      // don't hightlight the startNode
-      if (val == startNode) {
-        return;
-      }
-
-      // don't highlight the endNode
-      if (val == endNode) {
+      // don't hightlight the startNode or endNode
+      if (val === startNode || val === endNode) {
         return;
       }
 
@@ -107,6 +107,7 @@ class TableData extends React.Component {
         listChanged = [];
         listChanged.push(val);
         unit.classList.remove("wall");
+        unit.classList.remove("visited");
         unit.classList.remove("none");
       }
       
@@ -115,6 +116,7 @@ class TableData extends React.Component {
         listChanged.push(val);
         unit.classList.add("wall");
         unit.classList.add("none");
+        unit.classList.remove("visited");
       }
     }
   }
@@ -123,9 +125,9 @@ class TableData extends React.Component {
 
     startClick = val;
     endClick = val;
+    
     // if start, don't allow color change
-
-    if (val == startNode || val == endNode) {
+    if (val === startNode || val === endNode) {
       return;
     }
 
@@ -140,11 +142,13 @@ class TableData extends React.Component {
       listChanged.push(val);
       unit.classList.add("wall");
       unit.classList.add("none");
+      unit.classList.remove("visited");
     }
     else if (!listChanged.includes(val) && unit.classList.contains("wall")) {
       listChanged.push(val);
       unit.classList.remove("wall");
       unit.classList.remove("none");
+      unit.classList.remove("visited");
     }
   }
 
@@ -194,10 +198,10 @@ class Body extends React.Component {
         if (i === 29) {
           classes += "b-bottom ";
         }
-        if (i == 14 && j == 11) {
+        if (i === 14 && j === 11) {
           classes = "other";
         }
-        if (i == 14 && j == 43) {
+        if (i === 14 && j === 43) {
           classes = "other";
         }
         row.push(
@@ -223,6 +227,8 @@ class Body extends React.Component {
 
 // clears the board
 function clearBoard() {
+  clearOtherButtons();
+  visualized = false;
   var elements = document.getElementsByTagName("td");
   for (var x = 0; x < elements.length; ++x) {
     elements[x].classList.remove("visited");
@@ -231,6 +237,7 @@ function clearBoard() {
       elements[x].classList.remove("none");
     }
   }
+  algorithm = "";
 }
 
 // find coordinate on graph, can use to find <td>
@@ -238,26 +245,26 @@ function findCoords(position) {
   var row = "";
   var col = "";
 
-  if (startNode.length === 3) { // X-X
-    row = startNode.substring(0, 1);
-    col = startNode.substring(2);
+  if (position.length === 3) { // X-X
+    row = position.substring(0, 1);
+    col = position.substring(2);
   }
 
-  else if (startNode.length === 5) { // XX-XX
-    row = startNode.substring(0, 2);
-    col = startNode.substring(3);
+  else if (position.length === 5) { // XX-XX
+    row = position.substring(0, 2);
+    col = position.substring(3);
   }
 
   // two scenarios: XX-X or X-XX
-  else if (startNode.length === 4) {
+  else if (position.length === 4) {
 
-    if (startNode.substring(1, 2) === "-") { // X-XX
-      row = startNode.substring(0, 1);
-      col = startNode.substring(2);
+    if (position.substring(1, 2) === "-") { // X-XX
+      row = position.substring(0, 1);
+      col = position.substring(2);
     }
-    else if (startNode.substring(2, 3) === "-" ) { // XX_X
-      row = startNode.substring(0, 2);
-      col = startNode.substring(3);
+    else if (position.substring(2, 3) === "-" ) { // XX_X
+      row = position.substring(0, 2);
+      col = position.substring(3);
     }
   }
 
@@ -305,8 +312,8 @@ function calcWest(coord) {
   return false;
 }
 
-// visualize depth first search
-async function depthFirst() {
+// visualize depth or breadth first search
+async function DepthBreadth(alg) {
 
   // remove previous visited
   var elements = document.getElementsByTagName("td");
@@ -314,70 +321,121 @@ async function depthFirst() {
     elements[x].classList.remove("visited");
   }
 
-  // stack
+  // stack/queue
   var array = [];
 
   // calculating row and column
-  array.push(findCoords(startNode));
 
-  while (array.length != 0) {
-    var next = array.pop();
+  array.push(findCoords(lastStart));
+
+  // while array not empty on depth-first
+  var breadthCounter = 0;
+  while (array.length !== 0) {
+    var next;
+
+    if (alg === "depth") {
+      next = array.pop();
+    }
+
+    // for breadth-first, don't change array (expensive), just iterate through and add.
+    else {
+
+      // until we reach the end
+      if (breadthCounter === array.length) {
+        return;
+      }
+      next = array[breadthCounter];
+      ++breadthCounter;
+    }
+
+    // calculates nesw
     var north = calcNorth(next);
     var east = calcEast(next);
     var south = calcSouth(next);
     var west = calcWest(next);
-      
-    var nextId = "" + String(next[0]) + "-" + String(next[1]);
-    var nextElement = document.getElementById(nextId);
     
-    if (nextElement.innerHTML == '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
-      nextElement.classList.add("visited");
-      return;
-    }
-    else {
-      nextElement.classList.add("visited");
-    }
-    
-    await sleep(10);
+    // nice animation!
+    // await sleep(5);
 
-    // calculating north, east, south, west
-    if (north != false) {
+    // calculating north, east, south, west to see if they should be added
+    // also, if we ever find the end, we can stop.
+    if (north !== false) {
+      if (north.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+        north.classList.add("visited");
+        return;
+      }
       if (!north.classList.contains("wall") && !north.classList.contains("visited")) {
         array.push([next[0] - 1, next[1]]);
+        north.classList.add("visited");
       }
     }
 
-    if (east != false) {
+    if (east !== false) {
+      if (east.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+        east.classList.add("visited");
+        return;
+      }
       if (!east.classList.contains("wall") && !east.classList.contains("visited")) {
         array.push([next[0], next[1] + 1]);
+        east.classList.add("visited");
       }
     }
 
-    if (south != false) {
+    if (south !== false) {
+      if (south.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+        south.classList.add("visited");
+        return;
+      }
       if (!south.classList.contains("wall") && !south.classList.contains("visited")) {
         array.push([next[0] + 1, next[1]]);
+        south.classList.add("visited");
       }
-      
     }
 
-    if (west != false) {
+    if (west !== false) {
+      if (west.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
+        west.classList.add("visited");
+        return;
+      }
       if (!west.classList.contains("wall") && !west.classList.contains("visited")) {
         array.push([next[0], next[1] - 1]);
+        west.classList.add("visited");
       }
     }
+  }
+}
 
+// clear all other buttons
+function clearOtherButtons() {
+  var buttons = document.getElementsByClassName("algorithms");
+  for (var x = 0; x < buttons.length; ++x) {
+    buttons[x].classList.remove("selected");
   }
 }
 
 // set visualization to depth first search
 function setDepthFirst() {
+  clearOtherButtons();
   algorithm = "depth-first";
+  var buttons = document.getElementsByClassName("depth-first");
+  buttons[0].classList.add("selected");
+}
+
+function setBreadthFirst() {
+  clearOtherButtons();
+  algorithm = "breadth-first";
+  var buttons = document.getElementsByClassName("breadth-first");
+  buttons[0].classList.add("selected");
 }
 
 // calls correct algorithm to visualize
 function visualize() {
+  visualized = true;
   if (algorithm === "depth-first") {
-    depthFirst();
+    DepthBreadth("depth");
+  }
+  else if (algorithm === "breadth-first") {
+    DepthBreadth("breadth");
   }
   else {
     alert("Choose an algorithm on the left!");
@@ -396,7 +454,7 @@ async function randomMaze() {
     for (var j = 0; j < 55; ++j) {
       var idValue = "" + String(i) + "-" + String(j);
       var random = document.getElementById(idValue);
-      if (Math.floor(Math.random() * 6) == 1) {
+      if (Math.floor(Math.random() * 6) === 1) {
         if (!(idValue === lastStart || idValue === lastEnd)) {
           random.classList.add("wall");
           random.classList.add("none");
@@ -426,6 +484,7 @@ let element = document.getElementsByTagName("body")[0];
 
 // setting which algorithm
 let algorithm = "";
+let visualized = false;
 
 // entire body mouseup/down, keeping track when creating walls
 element.addEventListener("mousedown", function() {
@@ -450,7 +509,7 @@ function End(props) {
 
 function Random(props) {
   return(
-    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Random Maze </button>
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5 mazes"> Random Maze </button>
   );
 }
 
@@ -462,8 +521,20 @@ function Visualize(props) {
 
 function DepthFirst(props) {
   return(
-    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5"> Depth First Search </button>
+    <button onClick={props.onClick} className="search depth-first pt-1 pb-1 pl-2 pr-2 mr-5 mb-2 algorithms"> Depth First Search </button>
   );
+}
+
+function BreadthFirst(props) {
+  return(
+    <button onClick={props.onClick} className="search breadth-first pt-1 pb-1 pl-2 pr-2 mr-5 mb-2 algorithms"> Breadth First Search </button>
+  );
+}
+
+function ClearBoard(props) {
+  return(
+    <button className="btn btn-danger" onClick={props.onClick}> Clear Board </button>
+  )
 }
 
 ReactDOM.render(
@@ -501,4 +572,18 @@ ReactDOM.render(
     onClick={() => setDepthFirst()}
   />,
   document.getElementById('depth-first')
+)
+
+ReactDOM.render(
+  <BreadthFirst
+    onClick={() => setBreadthFirst()}
+  />,
+  document.getElementById('breadth-first')
+)
+
+ReactDOM.render(
+  <ClearBoard
+    onClick={() => clearBoard()}
+  />,
+  document.getElementById('clearBoard')
 )

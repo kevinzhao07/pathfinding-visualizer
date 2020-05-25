@@ -44,27 +44,28 @@
 
     <div class="row">
       <div class="column-2 mr-4">
-        <h4 class="p-1 pl-4 ml-1 algorithm-color"> Algorithms </h4>
+        <h4 class="p-1 pl-4 ml-1 algorithm-color mt-5 underline"> Algorithms </h4>
         <div id="depth-first">
         </div>
-        <h4 class="p-1 pl-4 ml-1 maze-color"> Maze Generation </h4>
+        <div id="breadth-first">
+        </div>
+        <h4 class="p-1 pl-4 ml-1 maze-color underline"> Maze Generation </h4>
         <div id="maze-generation">
         </div>
         <h4 class="p-1 pl-4 ml-1"> Add a Node </h4>
-        <h4 class="p-1 pl-4 ml-1"> Speed </h4>
+        <h4 class="p-1 pl-4 ml-1 underline"> Speed </h4>
         <div id="visualize" class="right">
 
         </div>
-        <div id="visualize" class="left">
-          <button class="btn btn-danger" onclick="clearBoard()"> Clear Board </button>
+        <div id="clearBoard" class="left">
         </div>
-        <h4 class="p-1 pl-4 ml-1 clear"> Legend </h4>
+        <h4 class="p-1 pl-4 ml-1 clear underline"> Legend </h4>
 
 
       </div>
 
       <div class="column-10">
-        <h2 id="title" class="text-center p-1"> click & drag to place walls, pick an algorithm, and visualize it! </h2>
+        <h2 id="title" class="text-center p-1"> click & drag to place walls and move nodes, pick an algorithm, and visualize it! </h2>
         <div id="table" class="ml-4"></div>
       </div>
 
@@ -77,17 +78,6 @@
   </body> <!-- end body -->
 
   <script type="text/javascript">
-
-    function clearBoard() {
-      var elements = document.getElementsByTagName("td");
-      for (var x = 0; x < elements.length; ++x) {
-        elements[x].classList.remove("visited");
-        if (elements[x].classList.contains("wall")) {
-          elements[x].classList.remove("wall");
-          elements[x].classList.remove("none");
-        }
-      }
-    }
 
   </script>
 
