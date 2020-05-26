@@ -3,7 +3,7 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-color: #3d3d3d;
+  background-color: #070707;
   color: #e3e3e3;
   user-select: none;
 }
@@ -35,23 +35,23 @@ div.column-10 {
 }
 
 td.unit {
-  border-top: 1px inset #858fa6;
-  border-left: 1px inset #858fa6;
+  border-top: 1px inset #b2b6be;
+  border-left: 1px inset #b2b6be;
   padding: 1.35vh;
   overflow: auto !important;
 }
 
 td.other {
-  border-top: 1px inset #858fa6;
-  border-left: 1px inset #858fa6;
+  border-top: 1px inset #b2b6be;
+  border-left: 1px inset #b2b6be;
 }
 
 td.b-right {
-  border-right: 1px inset #858fa6;
+  border-right: 1px inset #b2b6be;
 }
 
 td.b-bottom {
-  border-bottom: 1px inset #858fa6;
+  border-bottom: 1px inset #b2b6be;
 }
 
 td.wall {
@@ -62,7 +62,7 @@ td.wall {
 @keyframes changeColor {
   0% {
     background-color: transparent;
-    transform: scale(0.1);
+    transform: scale(0.3);
   }
   85% {
     transform: scale(1.10);
@@ -74,40 +74,63 @@ td.wall {
 }
 
 td.animation {
-  background-color: #51b3cc;
-  animation: colorVisited 0.25s;
+  background-color: #4ca6bd;
+  animation: colorVisited 1.5s;
 }
 
 td.no-animation {
-  background-color: #51b3cc;
+  background-color: #4ca6bd;
 }
 
 @keyframes colorVisited {
   0% {
-    background-color: #8ad5e7;
-    transform: scale(0.1);
+    background-color: #474a8a;
+    border-radius: 15px;
+    transform: scale(0.2);
   }
-  85% {
-    transform: scale(1.10);
+  15% {
+    transform: scale(0.35);
+  }
+  33% {
+    background-color: #5397a0;
+    border-radius: 10px;
+    transform: scale(0.60);
+  }
+  50% {
+    transform: scale(.9);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  80% {
+    background-color: #66c796;
+    border-radius: 5px;
+    transform: scale(1.20);
   }
   100% {
-    background-color: #51b3cc;
+    background-color: #4ca6bd;
     transform: scale(1.0);
   }
 }
 
 td.path {
-  background-color: #e9e642 !important;
-  /* animation: pathColor 0.25s; */
+  background-color: #e9e636 !important;
+}
+
+td.path-animation {
+  background-color: #e9e636 !important;
+  animation: pathColor 0.25s;
 }
 
 @keyframes pathColor {
   0% {
     background-color: transparent;
-    transform: scale(0.1);
+    transform: scale(0.8);
+    border-radius: 10px;
   }
-  85% {
-    transform: scale(1.10);
+  60% {
+    border-radius: 5px;
+    transform: scale(1.20);
   }
   100% {
     background-color: #e9e642;
@@ -130,12 +153,12 @@ i.start {
   font-size: 1.5em;
   margin-left: 8%;
   animation: moveStart 0.4s;
-  color: #dffdff;
+  color: #ff6666;
 }
 
 @keyframes moveStart {
   0% {
-    transform: scale(0.1);
+    transform: scale(0.4);
   }
   65% {
     transform: scale(1.20);
@@ -219,4 +242,8 @@ button.search:active {
 
 .underline {
   text-decoration: underline;
+}
+
+.unclickable {
+  pointer-events: none;
 }

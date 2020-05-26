@@ -109,6 +109,10 @@ class TableData extends React.Component {
         listChanged.push(val);
         unit.classList.remove("wall");
         unit.classList.remove("visited");
+        unit.classList.remove("animation");
+        unit.classList.remove("no-animation");
+        unit.classList.remove("path");
+        unit.classList.remove("path-animation");
         unit.classList.remove("none");
       }
       
@@ -118,6 +122,10 @@ class TableData extends React.Component {
         unit.classList.add("wall");
         unit.classList.add("none");
         unit.classList.remove("visited");
+        unit.classList.remove("animation");
+        unit.classList.remove("path");
+        unit.classList.remove("path-animation");
+        unit.classList.remove("no-animation");
       }
     }
   }
@@ -144,12 +152,16 @@ class TableData extends React.Component {
       unit.classList.add("wall");
       unit.classList.add("none");
       unit.classList.remove("visited");
+      unit.classList.remove("animation");
+      unit.classList.remove("no-animation");
     }
     else if (!listChanged.includes(val) && unit.classList.contains("wall")) {
       listChanged.push(val);
       unit.classList.remove("wall");
       unit.classList.remove("none");
       unit.classList.remove("visited");
+      unit.classList.remove("animation");
+      unit.classList.remove("no-animation");
     }
   }
 
@@ -158,7 +170,7 @@ class TableData extends React.Component {
     startNode = lastStart;
     endNode = lastEnd;
 
-    if (visualized) {
+    if (visualized && val === endNode) {
       visualize();
     }
 
@@ -239,6 +251,7 @@ function clearBoard() {
   for (var x = 0; x < elements.length; ++x) {
     elements[x].classList.remove("visited");
     elements[x].classList.remove("path");
+    elements[x].classList.remove("path-animation");
     elements[x].classList.remove("none");
     elements[x].classList.remove("animation");
     elements[x].classList.remove("no-animation");
@@ -321,8 +334,72 @@ function calcWest(coord) {
   return false;
 }
 
-async function DepthBreadth(alg) {
+function resolve(point, direction, next) {
+  if (point !== false) {
 
+    // is the inside of this the end node?
+    if (point.id === lastEnd) {
+
+      if (direction === "north") {
+        backtrack[next[0] - 1][next[1]] = "n";
+      }
+      else if (direction === "east") {
+        backtrack[next[0]][next[1] + 1] = "e";
+      }
+      else if (direction === "south") {
+        backtrack[next[0] + 1][next[1]] = "s";
+      }
+      else if (direction === "west") {
+        backtrack[next[0]][next[1] - 1] = "w";
+      }
+
+      point.classList.add('visited');
+      if (firstTime) {
+        document.getElementsByTagName("body")[0].classList.remove("unclickable");
+        point.classList.add("animation");
+      }
+      else {
+        point.classList.add("no-animation");
+      }
+      printPath();
+      return 'stop';
+    }
+
+    // if not, then only mark visited if not wall, not already visited, and not the start node
+    if (!point.classList.contains("wall") && !point.classList.contains("visited") && point.innerHTML === "") {
+      point.classList.add("visited");
+
+      if (direction === "north") {
+        array.push([next[0] - 1, next[1]]);
+        backtrack[next[0] - 1][next[1]] = "n";
+      }
+      else if (direction === "east") {
+        array.push([next[0], next[1] + 1]);
+        backtrack[next[0]][next[1] + 1] = "e";
+      }
+      else if (direction === "south") {
+        array.push([next[0] + 1, next[1]]);
+        backtrack[next[0] + 1][next[1]] = "s";
+      }
+      else if (direction === "west") {
+        backtrack[next[0]][next[1] - 1] = "w";
+        array.push([next[0], next[1] - 1]);
+      }
+
+      if (firstTime) {
+        point.classList.add("animation");
+      }
+      else {
+        point.classList.add("no-animation");
+      }
+    }
+  }
+}
+
+async function DepthBreadth(alg) {
+  if (firstTime) {
+    document.getElementsByTagName("body")[0].classList.add("unclickable");
+  }
   // remove previous markings and creates 2d array for backtrack
   backtrack = [];
   var row = [];
@@ -337,6 +414,7 @@ async function DepthBreadth(alg) {
     }
     elements[x].classList.remove("visited");
     elements[x].classList.remove("path");
+    elements[x].classList.remove("path-animation");
     elements[x].classList.remove("animation");
     elements[x].classList.remove("no-animation");
     if (!elements[x].classList.contains("wall")) {
@@ -346,7 +424,7 @@ async function DepthBreadth(alg) {
   console.log(backtrack);
   
   // stack/queue
-  var array = [];
+  array = [];
   
   // calculating row and column
   var startCoordinates = findCoords(lastStart);
@@ -381,125 +459,32 @@ async function DepthBreadth(alg) {
 
     // nice animation
     if (firstTime) {
-      await sleep(10);
+      await sleep(5);
     }
 
-    // calculating north, east, south, west to see if they should be added
-    // also, if we ever find the end, we can stop.
-    if (north !== false) {
-      if (north.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
-        backtrack[next[0] - 1][next[1]] = "n";
-        north.classList.add("visited");
-        if (firstTime) {
-          north.classList.add("animation");
-        }
-        else {
-          north.classList.add("no-animation");
-        }
-        printPath();
-        return;
-      }
-      if (!north.classList.contains("wall") && !north.classList.contains("visited") && north.innerHTML === "") {
-        array.push([next[0] - 1, next[1]]);
-        north.classList.add("visited");
-        if (firstTime) {
-          north.classList.add("animation");
-        }
-        else {
-          north.classList.add("no-animation");
-        }
-        backtrack[next[0] - 1][next[1]] = "n";
-      }
+    if (resolve(north, "north", next) === 'stop') {
+      return;
     }
-
-    if (east !== false) {
-      if (east.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
-        east.classList.add("visited");
-        backtrack[next[0]][next[1] + 1] = "e";
-        if (firstTime) {
-          east.classList.add("animation");
-        }
-        else {
-          east.classList.add("no-animation");
-        }
-        printPath();
-        return;
-      }
-      if (!east.classList.contains("wall") && !east.classList.contains("visited") && east.innerHTML === "") {
-        array.push([next[0], next[1] + 1]);
-        east.classList.add("visited");
-        if (firstTime) {
-          east.classList.add("animation");
-        }
-        else {
-          east.classList.add("no-animation");
-        }
-        backtrack[next[0]][next[1] + 1] = "e";
-      }
+    if (resolve(east, "east", next) === 'stop') {
+      return;
     }
-
-    if (south !== false) {
-      if (south.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
-        south.classList.add("visited");
-        backtrack[next[0] + 1][next[1]] = "s";
-        if (firstTime) {
-          south.classList.add("animation");
-        }
-        else {
-          south.classList.add("no-animation");
-        }
-        printPath();
-        return;
-      }
-      if (!south.classList.contains("wall") && !south.classList.contains("visited") && south.innerHTML === "") {
-        array.push([next[0] + 1, next[1]]);
-        south.classList.add("visited");
-        if (firstTime) {
-          south.classList.add("animation");
-        }
-        else {
-          south.classList.add("no-animation");
-        }
-        backtrack[next[0] + 1][next[1]] = "s";
-      }
+    if (resolve(south, "south", next) === 'stop') {
+      return;
     }
-
-    if (west !== false) {
-      if (west.innerHTML === '<i id="end-icon" class="fas fa-gift start" aria-hidden="true"></i>') {
-        west.classList.add("visited");
-        backtrack[next[0]][next[1] - 1] = "w";
-        if (firstTime) {
-          west.classList.add("animation");
-        }
-        else {
-          west.classList.add("no-animation");
-        }
-        printPath();
-        return;
-      }
-      if (!west.classList.contains("wall") && !west.classList.contains("visited") && west.innerHTML === "") {
-        array.push([next[0], next[1] - 1]);
-        west.classList.add("visited");
-        if (firstTime) {
-          west.classList.add("animation");
-        }
-        else {
-          west.classList.add("no-animation");
-        }
-        backtrack[next[0]][next[1] - 1] = "w";
-      }
+    if (resolve(west, "west", next) === 'stop') {
+      return;
     }
 
   }
 }
 
-function printPath() {
+async function printPath() {
   var endCoords = findCoords(lastEnd);
   
+  var forwardPath = [];
   // go back until we find the start node
   while (backtrack[endCoords[0]][endCoords[1]] !== "*") {
-    document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('path');
-    document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('none');
+    forwardPath.push(endCoords);
     
     // we came here from NORTH, to backtrack, so SOUTH
     if (backtrack[endCoords[0]][endCoords[1]] === "n") {
@@ -518,8 +503,20 @@ function printPath() {
       endCoords = [endCoords[0], endCoords[1] + 1];
     }
   }
-  document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('path');
-  document.getElementById(''+String(endCoords[0])+'-'+String(endCoords[1])).classList.add('none');
+  forwardPath.push(endCoords);
+
+  for (var x = forwardPath.length - 1; x >= 0; --x) {
+    if (firstTime) {
+      await sleep(20);
+      document.getElementById(''+String(forwardPath[x][0])+'-'+String(forwardPath[x][1])).classList.add('path-animation');
+    }
+    else {
+      document.getElementById(''+String(forwardPath[x][0])+'-'+String(forwardPath[x][1])).classList.add('path');
+    }
+    document.getElementById(''+String(forwardPath[x][0])+'-'+String(forwardPath[x][1])).classList.add('none');
+  }
+  
+
 }
 
 // clear all other buttons
@@ -614,6 +611,7 @@ let element = document.getElementsByTagName("body")[0];
 let algorithm = "";
 let visualized = false;
 let backtrack = [];
+let array = [];
 let firstTime = true;
 
 // entire body mouseup/down, keeping track when creating walls
