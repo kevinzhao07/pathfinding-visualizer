@@ -170,7 +170,7 @@ class TableData extends React.Component {
     startNode = lastStart;
     endNode = lastEnd;
 
-    if (visualized && val === endNode) {
+    if (visualized && val === endNode && !firstTime) {
       visualize();
     }
 
@@ -334,7 +334,7 @@ function calcWest(coord) {
   return false;
 }
 
-function resolve(point, direction, next) {
+function resolve(point, direction, next, classToAdd) {
   if (point !== false) {
 
     // is the inside of this the end node?
@@ -354,12 +354,9 @@ function resolve(point, direction, next) {
       }
 
       point.classList.add('visited');
+      point.classList.add(classToAdd);
       if (firstTime) {
         document.getElementsByTagName("body")[0].classList.remove("unclickable");
-        point.classList.add("animation");
-      }
-      else {
-        point.classList.add("no-animation");
       }
       printPath();
       return 'stop';
@@ -368,7 +365,7 @@ function resolve(point, direction, next) {
     // if not, then only mark visited if not wall, not already visited, and not the start node
     if (!point.classList.contains("wall") && !point.classList.contains("visited") && point.innerHTML === "") {
       point.classList.add("visited");
-
+      point.classList.add(classToAdd);
       if (direction === "north") {
         array.push([next[0] - 1, next[1]]);
         backtrack[next[0] - 1][next[1]] = "n";
@@ -385,19 +382,68 @@ function resolve(point, direction, next) {
         backtrack[next[0]][next[1] - 1] = "w";
         array.push([next[0], next[1] - 1]);
       }
-
-      if (firstTime) {
-        point.classList.add("animation");
-      }
-      else {
-        point.classList.add("no-animation");
-      }
     }
   }
 }
 
-async function DepthBreadth(alg) {
+function resolveDepth(point, direction, next, classToAdd) {
+  if (point !== false) {
+
+    // is the inside of this the end node?
+    if (point.id === lastEnd) {
+
+      if (direction === "north") {
+        backtrack[next[0] - 1][next[1]] = "n";
+      }
+      else if (direction === "east") {
+        backtrack[next[0]][next[1] + 1] = "e";
+      }
+      else if (direction === "south") {
+        backtrack[next[0] + 1][next[1]] = "s";
+      }
+      else if (direction === "west") {
+        backtrack[next[0]][next[1] - 1] = "w";
+      }
+
+      point.classList.add('visited');
+      point.classList.add(classToAdd);
+      if (firstTime) {
+        document.getElementsByTagName("body")[0].classList.remove("unclickable");
+      }
+      printPath();
+      return 'stop';
+    }
+
+    // if not, then only mark visited if not wall, not already visited, and not the start node
+    if (!point.classList.contains("wall") && !point.classList.contains("visited") && point.innerHTML === "") {
+      point.classList.add("visited");
+      point.classList.add(classToAdd);
+      if (direction === "north") {
+        array.push([next[0] - 1, next[1]]);
+        backtrack[next[0] - 1][next[1]] = "n";
+      }
+      else if (direction === "east") {
+        array.push([next[0], next[1] + 1]);
+        backtrack[next[0]][next[1] + 1] = "e";
+      }
+      else if (direction === "south") {
+        array.push([next[0] + 1, next[1]]);
+        backtrack[next[0] + 1][next[1]] = "s";
+      }
+      else if (direction === "west") {
+        backtrack[next[0]][next[1] - 1] = "w";
+        array.push([next[0], next[1] - 1]);
+      }
+      return "continue";
+    }
+  }
+  return "nothing";
+}
+
+async function breadth() {
+  var classToAdd = "no-animation";
   if (firstTime) {
+    classToAdd = "animation";
     document.getElementsByTagName("body")[0].classList.add("unclickable");
   }
   // remove previous markings and creates 2d array for backtrack
@@ -421,7 +467,6 @@ async function DepthBreadth(alg) {
       elements[x].classList.remove("none");
     }
   }
-  console.log(backtrack);
   
   // stack/queue
   array = [];
@@ -430,26 +475,21 @@ async function DepthBreadth(alg) {
   var startCoordinates = findCoords(lastStart);
   backtrack[startCoordinates[0]][startCoordinates[1]] = "*";
   array.push(startCoordinates);
-  
+  document.getElementById(lastStart).classList.add("visited");
+  document.getElementById(lastStart).classList.add(classToAdd);
+
   // while array not empty on depth-first
   var breadthCounter = 0;
   while (array.length != 0) {
     var next;
     
-    if (alg === "depth") {
-      next = array.pop();
-    }
-
     // for breadth-first, don't change array (expensive), just iterate through and add.
-    else {
-
-      // until we reach the end
-      if (breadthCounter === array.length) {
-        return;
-      }
-      next = array[breadthCounter];
-      ++breadthCounter;
+    // until we reach the end
+    if (breadthCounter === array.length) {
+      return;
     }
+    next = array[breadthCounter];
+    ++breadthCounter;
 
     // calculates nesw
     var north = calcNorth(next);
@@ -462,19 +502,112 @@ async function DepthBreadth(alg) {
       await sleep(5);
     }
 
-    if (resolve(north, "north", next) === 'stop') {
+    if (resolve(north, "north", next, classToAdd) === 'stop') {
       return;
     }
-    if (resolve(east, "east", next) === 'stop') {
+    if (resolve(east, "east", next, classToAdd) === 'stop') {
       return;
     }
-    if (resolve(south, "south", next) === 'stop') {
+    if (resolve(south, "south", next, classToAdd) === 'stop') {
       return;
     }
-    if (resolve(west, "west", next) === 'stop') {
+    if (resolve(west, "west", next, classToAdd) === 'stop') {
       return;
     }
 
+  }
+}
+
+async function depth() {
+  var classToAdd = "no-animation";
+  if (firstTime) {
+    classToAdd = "animation";
+    document.getElementsByTagName("body")[0].classList.add("unclickable");
+  }
+  // remove previous markings and creates 2d array for backtrack
+  backtrack = [];
+  var row = [];
+  var elements = document.getElementsByTagName("td");
+  for (var x = 0; x < elements.length; ++x) {
+    if (row.length !== 54) {
+      row.push('');
+    }
+    else {
+      row = [];
+      backtrack.push(row);
+    }
+    elements[x].classList.remove("visited");
+    elements[x].classList.remove("path");
+    elements[x].classList.remove("path-animation");
+    elements[x].classList.remove("animation");
+    elements[x].classList.remove("no-animation");
+    if (!elements[x].classList.contains("wall")) {
+      elements[x].classList.remove("none");
+    }
+  }
+  
+  // stack/queue
+  array = [];
+  
+  // start depth first search, add start node/visited.
+  var startCoordinates = findCoords(lastStart);
+  backtrack[startCoordinates[0]][startCoordinates[1]] = "*";
+  array.push(startCoordinates);
+  document.getElementById(lastStart).classList.add("visited");
+  document.getElementById(lastStart).classList.add(classToAdd);
+  
+  // while array not empty on depth-first
+  while (array.length != 0) {
+    var next;
+    
+    // gets last element like stack
+    next = array[array.length - 1];
+
+    // calculates nesw, if visited or DNE, skip. if not, add north and explore.
+    var north = calcNorth(next);
+    var east = calcEast(next);
+    var south = calcSouth(next);
+    var west = calcWest(next);
+
+    // nice animation
+    if (firstTime) {
+      await sleep(5);
+    }
+
+    var ansNorth = resolveDepth(north, "north", next, classToAdd);
+    if (ansNorth === 'stop') {
+      return;
+    }
+    else if (ansNorth === 'continue') {
+      continue;
+    }
+
+    var ansEast = resolveDepth(east, "east", next, classToAdd);
+    if (ansEast === 'stop') {
+      return;
+    }
+    else if (ansEast === 'continue') {
+      continue;
+    }
+
+    var ansSouth = resolveDepth(south, "south", next, classToAdd);
+    if (ansSouth === 'stop') {
+      return;
+    }
+    else if (ansSouth === 'continue') {
+      continue;
+    }
+
+    var ansWest = resolveDepth(west, "west", next, classToAdd);
+    if (ansWest === 'stop') {
+      return;
+    }
+    else if (ansWest === 'continue') {
+      continue;
+    }
+
+    // if reached here, no neighbors. just pop.
+    array.pop();
   }
 }
 
@@ -513,7 +646,6 @@ async function printPath() {
     else {
       document.getElementById(''+String(forwardPath[x][0])+'-'+String(forwardPath[x][1])).classList.add('path');
     }
-    document.getElementById(''+String(forwardPath[x][0])+'-'+String(forwardPath[x][1])).classList.add('none');
   }
   
 
@@ -546,13 +678,13 @@ function setBreadthFirst() {
 function visualize() {
   visualized = true;
   if (algorithm === "depth-first") {
-    DepthBreadth("depth");
+    depth();
     if (document.getElementById(lastEnd).classList.contains("visited")) {
       printPath();
     }
   }
   else if (algorithm === "breadth-first") {
-    DepthBreadth("breadth");
+    breadth();
     if (document.getElementById(lastEnd).classList.contains("visited")) {
       printPath();
     }
@@ -569,13 +701,13 @@ function sleep(ms) {
 }
 
 // creating random maze
-async function randomMaze() {
+async function randomMaze(value) {
   clearBoard();
   for (var i = 0; i < 30; ++i) {
     for (var j = 0; j < 55; ++j) {
       var idValue = "" + String(i) + "-" + String(j);
       var random = document.getElementById(idValue);
-      if (Math.floor(Math.random() * 6) === 1) {
+      if (Math.floor(Math.random() * value) === 1) {
         if (!(idValue === lastStart || idValue === lastEnd)) {
           random.classList.add("wall");
           random.classList.add("none");
@@ -635,15 +767,21 @@ function End(props) {
   );
 }
 
-function Random(props) {
+function RandomSparse(props) {
   return(
-    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5 mazes"> Random Maze </button>
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5 mb-2 mazes"> Sparse Random Maze </button>
+  );
+}
+
+function RandomDense(props) {
+  return(
+    <button onClick={props.onClick} className="random-maze pt-1 pb-1 pl-2 pr-2 mr-5 mb-2 mazes"> Dense Random Maze </button>
   );
 }
 
 function Visualize(props) {
   return(
-    <button onClick={props.onClick} onMouseDown={props.onMouseDown} className="btn btn-success"> Visualize! </button>
+    <button onClick={props.onClick} onMouseDown={props.onMouseDown} className="btn btn-success bold"> Visualize! </button>
   );
 }
 
@@ -661,7 +799,7 @@ function BreadthFirst(props) {
 
 function ClearBoard(props) {
   return(
-    <button className="btn btn-danger" onClick={props.onClick}> Clear Board </button>
+    <button className="btn btn-danger bold" onClick={props.onClick}> Clear Board </button>
   )
 }
 
@@ -682,10 +820,17 @@ ReactDOM.render(
 );
 
 ReactDOM.render(
-  <Random 
-    onClick={() => randomMaze()}
+  <RandomSparse 
+    onClick={() => randomMaze(12)}
   />,
-  document.getElementById('maze-generation')
+  document.getElementById('sparse-maze-generation')
+);
+
+ReactDOM.render(
+  <RandomDense 
+    onClick={() => randomMaze(4)}
+  />,
+  document.getElementById('dense-maze-generation')
 );
 
 ReactDOM.render(

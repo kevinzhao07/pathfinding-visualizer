@@ -74,12 +74,12 @@ td.wall {
 }
 
 td.animation {
-  background-color: #4ca6bd;
+  background-color: #55bed8;
   animation: colorVisited 1.5s;
 }
 
 td.no-animation {
-  background-color: #4ca6bd;
+  background-color: #55bed8;
 }
 
 @keyframes colorVisited {
@@ -108,28 +108,30 @@ td.no-animation {
     transform: scale(1.20);
   }
   100% {
-    background-color: #4ca6bd;
+    background-color: #55bed8;
     transform: scale(1.0);
   }
 }
 
 td.path {
   background-color: #e9e636 !important;
+  border-top: 1px inset #e9e636 !important;
+  border-left: 1px inset #e9e636 !important;
 }
 
 td.path-animation {
   background-color: #e9e636 !important;
-  animation: pathColor 0.25s;
+  border-top: 1px inset #e9e636 !important;
+  border-left: 1px inset #e9e636 !important;
+  animation: pathColor 0.4s;
 }
 
 @keyframes pathColor {
   0% {
     background-color: transparent;
-    transform: scale(0.8);
-    border-radius: 10px;
+    transform: scale(0.7);
   }
   60% {
-    border-radius: 5px;
     transform: scale(1.20);
   }
   100% {
@@ -153,7 +155,7 @@ i.start {
   font-size: 1.5em;
   margin-left: 8%;
   animation: moveStart 0.4s;
-  color: #ff6666;
+  color: #ff4343;
 }
 
 @keyframes moveStart {
@@ -178,6 +180,10 @@ i.dark {
 
 .algorithm-color {
   color: #dd7777;
+}
+
+.speed-color {
+  color: #cbf8c6;
 }
 
 button.random-maze {
@@ -240,10 +246,51 @@ button.search:active {
   }
 }
 
+button.bold {
+  font-weight: 500;
+}
+
 .underline {
   text-decoration: underline;
 }
 
 .unclickable {
   pointer-events: none;
+}
+
+p.desc {
+  float: left;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+i.display {
+  font-size: 2em;
+}
+
+div.node {
+  float: left;
+  height: 1.65vw;
+  width: 1.65vw;
+}
+
+div.empty-node {
+  border: 1px solid #b2b6be;
+}
+
+div.wall-node {
+  border: 1px solid #b2b6be;
+  background-color: #f2ffff;
+}
+
+div.searched-cells {
+  border: 1px solid #b2b6be;
+  background-color: #55bed8;
+  animation: colorVisited 1.5s;
+}
+
+div.shortest-path {
+  border: 1px solid #b2b6be;
+  background-color: #e9e636;
+  animation: pathColor 1.5s;
 }

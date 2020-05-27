@@ -50,17 +50,62 @@
         <div id="depth-first">
         </div>
         <h4 class="p-1 pl-4 ml-1 maze-color underline"> Maze Generation </h4>
-        <div id="maze-generation">
+        <div id="sparse-maze-generation">
         </div>
-        <h4 class="p-1 pl-4 ml-1"> Add a Node </h4>
-        <h4 class="p-1 pl-4 ml-1 underline"> Speed </h4>
-        <div id="visualize" class="right">
-
+        <div id="dense-maze-generation">
         </div>
-        <div id="clearBoard" class="left">
+        <h4 class="p-1 pl-4 ml-1 speed-color underline"> Speed </h4>
+        <div class="ml-4">
+          <button class="btn btn-success bold mb-2 ml-3"> Fast </button>
+          <button class="btn btn-warning bold mb-2"> Normal </button>
+          <button class="btn btn-danger bold mb-2"> Slow </button>
         </div>
         <h4 class="p-1 pl-4 ml-1 clear underline"> Legend </h4>
+        <div id="legend">
+          
+          <!-- start -->
+          <div class='mt-1'>
+            <i id="start-icon" class="far fa-arrow-alt-circle-right start display ml-5 mb-0"></i>
+            <p class="desc ml-3">start node</p>
+          </div> 
+          
+          <!-- end -->
+          <div>
+            <i id="end-icon" class="fas fa-gift start display ml-5 mb-0"></i>
+            <p class="desc ml-3">end node</p>
+          </div> 
+          
+          <!-- empty -->
+          <div>
+            <div class="node empty-node ml-5"></div>
+            <p class="desc ml-3">empty cells</p>
+          </div> 
+          
+          <!-- wall -->
+          <div>
+            <div class="node wall-node ml-5"></div>
+            <p class="desc ml-3">wall node</p>
+          </div> 
+          
+          <!-- searched -->
+          <div>
+            <div class="node searched-cells ml-5"></div>
+            <p class="desc ml-3">searched cells</p>
+          </div> 
 
+          <!-- path -->
+          <div>
+            <div class="node shortest-path ml-5"></div>
+            <p class="desc ml-3">shortest* path</p>
+          </div> 
+        </div>
+        
+        <div class='mt-5'>
+          <div id="visualize" class="right clear">
+          </div>
+          <div id="clearBoard" class="left">
+          </div>
+        </div>
 
       </div>
 
