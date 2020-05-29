@@ -30,6 +30,11 @@ div.column-10 {
   margin-left: 1.5vw;
 }
 
+.left-button {
+  float: left;
+  margin-left: 0.5vw;
+}
+
 .clear {
   clear: both;
 }
@@ -186,6 +191,36 @@ i.dark {
   color: #cbf8c6;
 }
 
+button.speed {
+  float: right;
+  border-radius: 10px;
+  outline: none;
+  background-color: #5ca755;
+  border-top: 2px solid #bcf7c4;
+  border-left: 2px solid #bcf7c4;
+  border-right: 2px solid #669c69;
+  border-bottom: 2px solid #669c69;
+  font-weight: 600;
+}
+
+button.speed:hover {
+  background-color: #40773f;
+  animation: speed-change 0.4s;
+}
+
+button.select-speed {
+  background-color: #40773f !important;
+}
+
+@keyframes speed-change {
+  0% {
+    background-color: #5ca755;
+  }
+  100% {
+    background-color: #3e723c;
+  }
+}
+
 button.random-maze {
   float: right;
   border-radius: 10px;
@@ -202,6 +237,7 @@ button.random-maze:hover {
   background-color: #4d7491;
   animation: random-maze 0.4s;
 }
+
 
 @keyframes random-maze {
   0% {
@@ -244,6 +280,10 @@ button.search:active {
   100% {
     background-color: #914d4d;
   }
+}
+
+.push-left {
+  margin-left: -20px;
 }
 
 button.bold {

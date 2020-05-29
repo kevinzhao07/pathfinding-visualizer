@@ -154,6 +154,8 @@ class TableData extends React.Component {
       unit.classList.remove("visited");
       unit.classList.remove("animation");
       unit.classList.remove("no-animation");
+      unit.classList.remove("path");
+      unit.classList.remove("path-animation");
     }
     else if (!listChanged.includes(val) && unit.classList.contains("wall")) {
       listChanged.push(val);
@@ -162,6 +164,8 @@ class TableData extends React.Component {
       unit.classList.remove("visited");
       unit.classList.remove("animation");
       unit.classList.remove("no-animation");
+      unit.classList.remove("path");
+      unit.classList.remove("path-animation");
     }
   }
 
@@ -354,10 +358,8 @@ function resolve(point, direction, next, classToAdd) {
       }
 
       point.classList.add('visited');
+      element.classList.remove("unclickable");
       point.classList.add(classToAdd);
-      if (firstTime) {
-        document.getElementsByTagName("body")[0].classList.remove("unclickable");
-      }
       printPath();
       return 'stop';
     }
@@ -406,10 +408,8 @@ function resolveDepth(point, direction, next, classToAdd) {
       }
 
       point.classList.add('visited');
+      element.classList.remove("unclickable");
       point.classList.add(classToAdd);
-      if (firstTime) {
-        document.getElementsByTagName("body")[0].classList.remove("unclickable");
-      }
       printPath();
       return 'stop';
     }
@@ -444,7 +444,7 @@ async function breadth() {
   var classToAdd = "no-animation";
   if (firstTime) {
     classToAdd = "animation";
-    document.getElementsByTagName("body")[0].classList.add("unclickable");
+    element.classList.add("unclickable");
   }
   // remove previous markings and creates 2d array for backtrack
   backtrack = [];
@@ -499,7 +499,7 @@ async function breadth() {
 
     // nice animation
     if (firstTime) {
-      await sleep(5);
+      await sleep(speed);
     }
 
     if (resolve(north, "north", next, classToAdd) === 'stop') {
@@ -515,6 +515,9 @@ async function breadth() {
       return;
     }
 
+    if (breadthCounter === array.length) {
+      element.classList.remove('unclickable');
+    }
   }
 }
 
@@ -522,7 +525,7 @@ async function depth() {
   var classToAdd = "no-animation";
   if (firstTime) {
     classToAdd = "animation";
-    document.getElementsByTagName("body")[0].classList.add("unclickable");
+    element.classList.add("unclickable");
   }
   // remove previous markings and creates 2d array for backtrack
   backtrack = [];
@@ -571,7 +574,7 @@ async function depth() {
 
     // nice animation
     if (firstTime) {
-      await sleep(5);
+      await sleep(speed);
     }
 
     var ansNorth = resolveDepth(north, "north", next, classToAdd);
@@ -608,6 +611,10 @@ async function depth() {
 
     // if reached here, no neighbors. just pop.
     array.pop();
+
+    if (array.length === 0) {
+      element.classList.remove("unclickable");
+    }
   }
 }
 
@@ -682,12 +689,14 @@ function visualize() {
     if (document.getElementById(lastEnd).classList.contains("visited")) {
       printPath();
     }
+    // element.classList.remove("unclickable");
   }
   else if (algorithm === "breadth-first") {
     breadth();
     if (document.getElementById(lastEnd).classList.contains("visited")) {
       printPath();
     }
+    // element.classList.remove("unclickable");
   }
   else {
     visualized = false;
@@ -722,6 +731,30 @@ function clearFirstTime() {
   firstTime = true;
 }
 
+function resetSpeed() {
+  document.getElementById('button-fast').classList.remove('select-speed');
+  document.getElementById('button-normal').classList.remove('select-speed');
+  document.getElementById('button-slow').classList.remove('select-speed');
+}
+
+function setFast() {
+  resetSpeed();
+  document.getElementById('button-fast').classList.add('select-speed');
+  speed = 5;
+}
+
+function setNormal() {
+  resetSpeed();
+  document.getElementById('button-normal').classList.add('select-speed');
+  speed = 35;
+}
+
+function setSlow() {
+  resetSpeed();
+  document.getElementById('button-slow').classList.add('select-speed');
+  speed = 85;
+}
+
 // modifying where the startNode is
 let startNode = "14-11";
 let startClick = "";
@@ -745,6 +778,9 @@ let visualized = false;
 let backtrack = [];
 let array = [];
 let firstTime = true;
+
+// speed
+let speed = 5;
 
 // entire body mouseup/down, keeping track when creating walls
 element.addEventListener("mousedown", function() {
@@ -800,6 +836,24 @@ function BreadthFirst(props) {
 function ClearBoard(props) {
   return(
     <button className="btn btn-danger bold" onClick={props.onClick}> Clear Board </button>
+  )
+}
+
+function Fast(props) {
+  return(
+    <button id="button-fast" className="speed bold pt-1 pb-1 pl-3 pr-3 mb-2 select-speed" onClick={props.onClick}> Fast </button>
+  )
+}
+
+function Normal(props) {
+  return(
+    <button id="button-normal" className="speed bold pt-1 pb-1 pl-2 pr-2 mb-2 " onClick={props.onClick}> Normal </button>
+  )
+}
+
+function Slow(props) {
+  return(
+    <button id="button-slow" className="speed bold pt-1 pb-1 pl-3 pr-3 mb-2 " onClick={props.onClick}> Slow </button>
   )
 }
 
@@ -860,4 +914,25 @@ ReactDOM.render(
     onClick={() => clearBoard()}
   />,
   document.getElementById('clearBoard')
+)
+
+ReactDOM.render(
+  <Fast
+    onClick={() => setFast()}
+  />,
+  document.getElementById('fast')
+)
+
+ReactDOM.render(
+  <Normal
+    onClick={() => setNormal()}
+  />,
+  document.getElementById('normal')
+)
+
+ReactDOM.render(
+  <Slow
+    onClick={() => setSlow()}
+  />,
+  document.getElementById('slow')
 )
