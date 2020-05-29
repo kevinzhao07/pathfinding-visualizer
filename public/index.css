@@ -21,6 +21,7 @@ div.column-10 {
   width: 82%;
 }
 
+
 .right {
   float: right;
 }
@@ -61,6 +62,8 @@ td.b-bottom {
 
 td.wall {
   background-color: #f2ffff;
+  border-right: 1px inset #f2ffff !important;
+  border-top: 1px inset #f2ffff !important;
   animation: changeColor 0.25s;
 }
 
@@ -143,11 +146,6 @@ td.path-animation {
     background-color: #e9e642;
     transform: scale(1.0);
   }
-}
-
-table.grid {
-  height: 85vh;
-  width: 90%;
 }
 
 .none {

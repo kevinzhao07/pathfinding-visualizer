@@ -80,13 +80,13 @@ class TableData extends React.Component {
         // adding the new endNode
         unit = document.getElementById(val);
         unit.classList.remove("unit");
+        unit.classList.add("other");
         hadWallEnd = false;
         if (unit.classList.contains("wall")) {
           hadWallEnd = true;
           unit.classList.remove("wall");
           unit.classList.remove("none");
         }
-        unit.classList.add("other");
         unit.innerHTML = '<i id="end-icon" class="fas fa-gift start"></i>';
 
         return; // don't execute rest
@@ -238,7 +238,7 @@ class Body extends React.Component {
     }
 
     return (
-      <table className="grid">
+      <table className="grid" width="810px">
         <thead>
           {table}
         </thead>
