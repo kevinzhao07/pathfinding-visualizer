@@ -6,6 +6,7 @@
   background-color: #070707;
   color: #e3e3e3;
   user-select: none;
+  font-size: 0.95em;
 }
 
 a {
@@ -50,6 +51,7 @@ td.unit {
 td.other {
   border-top: 1px inset #b2b6be;
   border-left: 1px inset #b2b6be;
+  font-size: 1.4em;
 }
 
 td.b-right {
@@ -155,7 +157,7 @@ td.path-animation {
 i.start {
   background-color: transparent !important;
   float: left;
-  font-size: 1.5em;
+  font-size: 1.3em !important;
   margin-left: 8%;
   animation: moveStart 0.4s;
   color: #ff4343;
@@ -298,12 +300,12 @@ button.bold {
 
 p.desc {
   float: left;
-  font-size: 1.1em;
+  font-size: 1.1em !important;
   font-weight: 500;
 }
 
 i.display {
-  font-size: 2em;
+  font-size: 2em !important;
 }
 
 div.node {
@@ -331,4 +333,8 @@ div.shortest-path {
   border: 1px solid #b2b6be;
   background-color: #e9e636;
   animation: pathColor 1.5s;
+}
+
+.btn {
+  font-size: 0.95em !important;
 }
